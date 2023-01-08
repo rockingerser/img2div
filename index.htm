@@ -38,7 +38,20 @@
                 <span id="compress-level">1</span>
             </div>
             <div>
-                <input id="upload" type="submit" value="Upload">
+                <label for="img-width">Image width:</label>
+                <input id="img-width" type="number" placeholder="Empty: auto">
+            </div>
+            <div>
+                <label for="img-height">Image height:</label>
+                <input id="img-height" type="number" placeholder="Empty: auto">
+            </div>
+            <h2>Effects</h2>
+            <div>
+                <label for="img-bright">Brightness:</label>
+                <input id="img-bright" type="number" min="0" step=".01" placeholder="1">
+            </div>
+            <div>
+                <input id="upload" type="submit" value="Start">
             </div>
         </form>
         <div id="output"></div>

@@ -11,6 +11,9 @@
     const useInvalid = document.getElementById('use-invalid');
     const compression = document.getElementById('compress');
     const compressLevel = document.getElementById('compress-level');
+    const widthInput = document.getElementById('img-width');
+    const heightInput = document.getElementById('img-height');
+    const imgBright = document.getElementById('img-bright');
     const output = document.getElementById('output');
     const oldURLs = [];
     const canvas = document.createElement('canvas');
@@ -36,6 +39,10 @@
     });
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
+        const brightness = imgBright.value == '' ? 1 : imgBright.value;
+        function toPixel(p) {
+            return p * brightness;
+        }
         if (true || updated) {
             output.innerHTML = '';
             for (let i = 0; i < oldURLs.length; i++) {
@@ -43,13 +50,21 @@
                 const div = document.createElement('div');
                 const image = document.createElement('img');
                 image.src = url;
-                //div.appendChild(image);
+                if (widthInput.value != '') {
+                    image.width = widthInput.value;
+                }
+                if (heightInput.value != '') {
+                    image.height = heightInput.value;
+                }
+                image.style = 'position:absolute;filter:opacity(0)';
+                div.appendChild(image);
+
                 image.addEventListener('load', async function (e) {
                     const divImage = document.createElement('div');
                     divImage.className = 'div-image';
 
-                    canvas.width = image.naturalWidth;
-                    canvas.height = image.naturalHeight;
+                    canvas.width = image.offsetWidth > 0 ? image.offsetWidth : image.naturalWidth;
+                    canvas.height = image.offsetHeight > 0 ? image.offsetHeight : image.naturalHeight;
 
                     divImage.style.width = canvas.width + 'px';
                     divImage.style.height = canvas.height + 'px';
@@ -76,14 +91,14 @@
                             continue;
                         }*/
                         function getColor(array = false) {
-                            const ret = `${pixel[i]},${pixel[i + 1]},${pixel[i + 2]},${pixel[i + 3]}`;
+                            const ret = `${toPixel(pixel[i])},${toPixel(pixel[i + 1])},${toPixel(pixel[i + 2])},${pixel[i + 3]}`;
                             if (array) {
                                 return ret.split(',');
                             }
                             return ret;
                         }
                         function getDiff(r = pixel[i - 4], g = pixel[i - 3], b = pixel[i - 2], a = pixel[i - 1], r2 = pixel[i], g2 = pixel[i + 1], b2 = pixel[i + 2], a2 = pixel[i + 3]) {
-                            return Math.abs(r2 - r) + Math.abs(g2 - g) + Math.abs(b2 - b) + Math.abs(a2 - a);
+                            return Math.abs(toPixel(r2 - r)) + Math.abs(toPixel(g2 - g)) + Math.abs(toPixel(b2 - b)) + Math.abs(a2 - a);
                         }
                         diff = getDiff();
                         currColor = getColor();
