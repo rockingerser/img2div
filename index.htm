@@ -3,28 +3,46 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Page Title</title>
+    <title>Convert image to div online</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style/common.css">
 </head>
 <body>
-    <form id="upload-form">
-        <fieldset>
-            <legend>Upload an image file.</legend>
-            <label for="image-upload">Your image file:</label>
-            <input name="image" id="image-upload" type="file" accept="image/*" required multiple>
-            <br>
-            <label for="use-invalid">Use invalid HTML to reduce file size.</label>
-            <input id="use-invalid" type="checkbox">
-            <br>
-            <label for="compress">Compression level:</label>
-            <input id="compress" type="range" min="0" max="512" value="1">
-            <span id="compress-level">1</span>
-            <br>
-            <input id="upload" type="submit" value="Upload">
-        </fieldset>
-    </form>
-    <div id="output"></div>
+    <main id="window-main">
+        <h1 id="main-h1">Image to div</h1>
+        <p>This tool will convert your images into div data. This tool can be used to test Wikipedia images before uploading them.</p>
+        <div id="test">
+            <div>
+                <img src="assets/uploads/4320.bmp" alt="Image to convert">
+            </div>
+            <div>
+                <img src="assets/uploads/4330.png" alt="Result">
+            </div>
+        </div>
+        <span class="attr"><a href="https://www.freepik.com/free-vector/cute-diver-swim-with-shark-cartoon-vector-icon-illustration-science-animal-icon-concept-isolated_29835367.htm#query=cartoon%20person&position=30&from_view=search&track=sph">Image by catalyststuff</a> on Freepik</span>
+        <form id="upload-form">
+            <h2>Upload an image file.</h2>
+            <div>Your image file:
+                <input name="image" id="image-upload" type="file" accept="image/*" required multiple>
+                <button type="button">
+                    <label for="image-upload">Select File</label>
+                </button>
+            </div>
+            <div>
+                <label for="use-invalid">Use invalid HTML to reduce file size.</label>
+                <input id="use-invalid" type="checkbox">
+            </div>
+            <div>
+                <label for="compress">Compression level:</label>
+                <input id="compress" type="range" min="0" max="512" value="1">
+                <span id="compress-level">1</span>
+            </div>
+            <div>
+                <input id="upload" type="submit" value="Upload">
+            </div>
+        </form>
+        <div id="output"></div>
+    </main>
     <script src="js/common.js"></script>
 </body>
 </html>

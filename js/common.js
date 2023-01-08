@@ -21,7 +21,7 @@
 
     let updated = false;
 
-    compression.addEventListener('change', function () {
+    compression.addEventListener('input', function () {
         compressLevel.innerText = this.value;
     });
     fileInput.addEventListener('change', function () {
@@ -37,9 +37,9 @@
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
         if (true || updated) {
+            output.innerHTML = '';
             for (let i = 0; i < oldURLs.length; i++) {
                 const url = oldURLs[i];
-                output.innerHTML = '';
                 const div = document.createElement('div');
                 const image = document.createElement('img');
                 image.src = url;
@@ -88,22 +88,24 @@
                         diff = getDiff();
                         currColor = getColor();
 
-                        if (diff < compression.value) {
+                        if (diff <= compression.value && i / 4 % canvas.width > 0) {
+                            single.style.width = parseInt(single.style.width) + 1 + 'px';
                             /*
                             const oldIndex = i;
                             let rows = 1;
-                            const top = Math.floor(i / 4 / canvas.width);*/
+                            const top = Math.floor(i / 4 / canvas.width);
                             let horizontal = 1;
                             const startColor = getColor(true);
                             let color = startColor;
-                            while (getDiff(/*color[0], color[1], color[2], color[3], startColor[0], startColor[1], startColor[2], startColor[3]*/) < compression.value && (i / 4) % canvas.width > 0/*top == Math.floor(i / 4 / canvas.width)*/) {
+                            const startIndex = i;
+
+                            while (getDiff(pixel[startIndex], pixel[startIndex + 1], pixel[startIndex + 2], pixel[startIndex + 3]) <= compression.value && i / 4 % canvas.width > 0/*top == Math.floor(i / 4 / canvas.width)) {
+                                i += 4;
                                 horizontal += 1;
                                 //lockedIndexes.push(i);
-                                i += 4;
-                                color = getColor(true);
+                                //color = getColor(true);
                             }
                             single.style.width = horizontal + 'px';
-                            /*
                             const oldIndex2 = i - 4;
                             i = oldIndex;
                             let oldIndexX = oldIndex2 / 4 % canvas.width;
@@ -134,7 +136,7 @@
                                 single.style.height = rows + 'px';
                             }
                             i = oldIndex;*/
-                        }
+                        } else {
                             single = document.createElement(useinvalid);
                             single.style.width = '1px';
                             single.style.height = '1px';
@@ -145,6 +147,7 @@
                             }
                             single.style.background = 'rgba(' + currColor + ')';
                             divImage.appendChild(single);
+                        }
                     }
 
                     div.appendChild(divImage);
