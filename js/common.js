@@ -13,8 +13,15 @@
     const compressLevel = document.getElementById('compress-level');
     const widthInput = document.getElementById('img-width');
     const heightInput = document.getElementById('img-height');
+    const imgCont = document.getElementById('img-cont');
     const imgBright = document.getElementById('img-bright');
+    const imgSat = document.getElementById('img-sat');
+    const imgHue = document.getElementById('img-hue');
     const output = document.getElementById('output');
+    const addMore = document.getElementById('add-urls');
+    const urlDiv = document.getElementById('urls');
+    const firstUrlUpload = document.getElementById('first-url-upload');
+    const filesSpan = document.getElementById('files');
     const oldURLs = [];
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', {
@@ -23,30 +30,88 @@
     });
 
     let updated = false;
+    let urlButtons = 1;
 
     compression.addEventListener('input', function () {
         compressLevel.innerText = this.value;
+    });
+    firstUrlUpload.addEventListener('change', function () {
+        fileInput.required = urlButtons <= 1 && this.value.length <= 0;
     });
     fileInput.addEventListener('change', function () {
         while (oldURLs.length > 0) {
             URL.revokeObjectURL(oldURLs.shift());
         }
+        files.innerText = '';
         for (let i = 0; i < this.files.length; i++) {
             const file = this.files[i];
+            files.innerText += ' ' + file.name;
+            if (this.files.length > 1) {
+                files.innerText += ',';
+            }
             oldURLs.push(URL.createObjectURL(file));
+        }
+        const imageUrls = document.querySelectorAll('.url-upload');
+        for (let i = 0; i < imageUrls.length; i++) {
+            const currUrl = imageUrls[i];
+            if (currUrl.value == '') {
+                continue;
+            }
+            oldURLs.push(currUrl.value);
         }
         updated = true;
     });
+    addMore.addEventListener('click', function () {
+        fileInput.required = false;
+        urlButtons += 1;
+        const input = document.createElement('input');
+        const button = document.createElement('input');
+
+        input.className = 'url-upload';
+        input.type = 'url';
+        input.placeholder = 'https://www.example.com/myimage.png';
+        input.required = true;
+
+        button.type = 'button';
+        button.value = 'Remove';
+        button.addEventListener('click', function () {
+            fileInput.required = (--urlButtons) <= 1 && firstUrlUpload.value.length <= 0;
+            input.remove();
+            button.remove();
+        });
+
+        urlDiv.appendChild(input);
+        input.insertAdjacentElement('afterend', button);
+    });
+    let firstSubmit = false
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const brightness = imgBright.value == '' ? 1 : imgBright.value;
-        function toPixel(p) {
-            return p * brightness;
+
+        if (!firstSubmit) {
+            onbeforeunload = function() {
+                return false;
+            };
+            firstSubmit = true;
         }
+
+        const contrast = imgCont.value == '' ? 1 : imgCont.value
+        const brightness = imgBright.value == '' ? 1 : imgBright.value;
+        const saturate = imgSat.value == '' ? 1 : imgSat.value;
+        const hueRotate = imgHue.value == '' ? 0 : imgHue.value;
+
         if (true || updated) {
             output.innerHTML = '';
-            for (let i = 0; i < oldURLs.length; i++) {
-                const url = oldURLs[i];
+            const myURLs = [...oldURLs];
+            const imageUrls = document.querySelectorAll('.url-upload');
+            for (let i = 0; i < imageUrls.length; i++) {
+                const currUrl = imageUrls[i];
+                if (currUrl.value == '') {
+                    continue;
+                }
+                myURLs.push(currUrl.value);
+            }
+            for (let i = 0; i < myURLs.length; i++) {
+                const url = myURLs[i];
                 const div = document.createElement('div');
                 const image = document.createElement('img');
                 image.src = url;
@@ -56,7 +121,7 @@
                 if (heightInput.value != '') {
                     image.height = heightInput.value;
                 }
-                image.style = 'position:absolute;filter:opacity(0)';
+                image.style = 'position:absolute;filter:opacity(0);pointer-events:none';
                 div.appendChild(image);
 
                 image.addEventListener('load', async function (e) {
@@ -71,6 +136,7 @@
                     divImage.style.display = 'flex';
                     divImage.style.flexWrap = 'wrap';
 
+                    ctx.filter = `contrast(${contrast}) brightness(${brightness}) saturate(${saturate}) hue-rotate(${hueRotate}deg)`;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                     ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
 
@@ -91,14 +157,14 @@
                             continue;
                         }*/
                         function getColor(array = false) {
-                            const ret = `${toPixel(pixel[i])},${toPixel(pixel[i + 1])},${toPixel(pixel[i + 2])},${pixel[i + 3]}`;
+                            const ret = `${pixel[i]},${pixel[i + 1]},${pixel[i + 2]},${pixel[i + 3]}`;
                             if (array) {
                                 return ret.split(',');
                             }
                             return ret;
                         }
                         function getDiff(r = pixel[i - 4], g = pixel[i - 3], b = pixel[i - 2], a = pixel[i - 1], r2 = pixel[i], g2 = pixel[i + 1], b2 = pixel[i + 2], a2 = pixel[i + 3]) {
-                            return Math.abs(toPixel(r2 - r)) + Math.abs(toPixel(g2 - g)) + Math.abs(toPixel(b2 - b)) + Math.abs(a2 - a);
+                            return Math.abs(r2 - r) + Math.abs(g2 - g) + Math.abs(b2 - b) + Math.abs(a2 - a);
                         }
                         diff = getDiff();
                         currColor = getColor();

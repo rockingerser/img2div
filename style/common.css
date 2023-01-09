@@ -10,13 +10,15 @@ body {
 * {
     font-family: quicksand, helvetica neue, helvetica, arial, sans-serif;
 }
-textarea, code, pre {
+code, pre {
     padding: .4em;
     border-radius: .4em;
     background-color: #8882;
-    font: .7em courier new, courier, monospace;
     width: 100%;
     resize: vertical;
+}
+textarea, code, pre {
+    font: .7em courier new, courier, monospace;
 }
 button, input[type=button], input[type=submit] {
     -webkit-appearance: none;
@@ -26,15 +28,33 @@ button, input[type=button], input[type=submit] {
     padding: 0;
     color: #fff;
     border: 0;
-    border-radius: .3em;
+    width: max-content;
     background-color: #9600fc;
-    font-size: 1.1em;
-    font-weight: 700;
+    font-size: 1em;
+    font-weight: 600;
 }
 input[type=range] {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+}
+textarea, input[type=text], input[type=url], input[type=number] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: .5em;
+    border: none;
+    margin: 4px;
+    outline: 1px solid #000;
+    transition: outline .2s cubic-bezier(0.19, 1, 0.22, 1);
+    width: 100%;
+    max-width: 360px;
+}
+textarea:focus, input[type=text]:focus, input[type=url]:focus, input[type=number]:focus {
+    outline-color: #26f;
+}
+input[type=number] {
+    max-width: 60px;
 }
 input[type=range]::-webkit-slider-runnable-track {
     -webkit-appearance: none;
@@ -43,7 +63,7 @@ input[type=range]::-webkit-slider-runnable-track {
     height: 8px;
     border-radius: 8px;
     background-color: #9b9b9b;
-    border: 1px solid #545454;
+    /*border: 1px solid #545454;*/
 }
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
@@ -56,7 +76,7 @@ input[type=range]::-webkit-slider-thumb {
     translate: 0 -50%;
     border-radius: 50%;
     background: #9600fc;
-    border: 1px solid #6400a7;
+    /*border: 1px solid #6400a7;*/
 }
 button * {
     width: 100%;
@@ -64,16 +84,19 @@ button * {
     display: flex;
 }
 button *, input[type=button], input[type=submit] {
-    padding: .4em 1.2em;
+    padding: .3em 1.5em;
 }
 #output, #output div {
     display: grid;
     overflow-x: auto;
 }
-#image-upload {
+input[type=file] {
+    width: 1px;
     position: absolute;
     pointer-events: none;
     filter: opacity(0);
+    margin-left: 20px;
+    margin-top: 1.6em;
 }
 #test {
     width: 100%;
@@ -104,7 +127,7 @@ button *, input[type=button], input[type=submit] {
 }
 #upload-form div {
     margin: 12px 0;
-    max-height: 1.75em;
+    min-height: 1.75em;
 }
 .attr {
     font-weight: 900;

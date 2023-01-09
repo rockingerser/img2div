@@ -19,15 +19,26 @@
                 <img src="assets/uploads/4330.png" alt="Result">
             </div>
         </div>
-        <span class="attr"><a href="https://www.freepik.com/free-vector/cute-diver-swim-with-shark-cartoon-vector-icon-illustration-science-animal-icon-concept-isolated_29835367.htm#query=cartoon%20person&position=30&from_view=search&track=sph">Image by catalyststuff</a> on Freepik</span>
+        <span class="attr"><a target="_blank" href="https://www.freepik.com/free-vector/cute-diver-swim-with-shark-cartoon-vector-icon-illustration-science-animal-icon-concept-isolated_29835367.htm#query=cartoon%20person&position=30&from_view=search&track=sph">Image by catalyststuff</a> on Freepik</span>
         <form id="upload-form">
             <h2>Upload an image file.</h2>
-            <div>Your image file:
-                <input name="image" id="image-upload" type="file" accept="image/*" required multiple>
+            <div>
+                Your image file:
+                <input id="image-upload" type="file" accept="image/*" required multiple>
                 <button type="button">
-                    <label for="image-upload">Select File</label>
+                    <label for="image-upload">Select Files</label>
                 </button>
+                <br>
+                Files:
+                <span id="files"></span>
             </div>
+            Or load image from URL:
+            <div id="urls">
+                <input id="first-url-upload" class="url-upload" type="url" placeholder="https://www.example.com/myimage.png">
+            </div>
+            <p class="attr">Note that most online images are <a target="_blank" href="https://support.google.com/legal/answer/3463239">protected by copyright</a>.</p>
+            <input id="add-urls" type="button" value="Add More">
+            <h2>Settings</h2>
             <div>
                 <label for="use-invalid">Use invalid HTML to reduce file size.</label>
                 <input id="use-invalid" type="checkbox">
@@ -39,16 +50,30 @@
             </div>
             <div>
                 <label for="img-width">Image width:</label>
-                <input id="img-width" type="number" placeholder="Empty: auto">
+                <input id="img-width" type="number" placeholder="0">
+                Empty: auto
             </div>
             <div>
                 <label for="img-height">Image height:</label>
-                <input id="img-height" type="number" placeholder="Empty: auto">
+                <input id="img-height" type="number" placeholder="0">
+                Empty: auto
             </div>
             <h2>Effects</h2>
             <div>
+                <label for="img-cont">Contrast:</label>
+                <input id="img-cont" type="number" min="0" step=".01" placeholder="1">
+            </div>
+            <div>
                 <label for="img-bright">Brightness:</label>
                 <input id="img-bright" type="number" min="0" step=".01" placeholder="1">
+            </div>
+            <div>
+                <label for="img-sat">Saturate:</label>
+                <input id="img-sat" type="number" min="0" step=".01" placeholder="1">
+            </div>
+            <div>
+                <label for="img-hue">Hue:</label>
+                <input id="img-hue" type="number" step=".1" placeholder="0 - 360">
             </div>
             <div>
                 <input id="upload" type="submit" value="Start">
