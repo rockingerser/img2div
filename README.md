@@ -1,2 +1,2 @@
 # img2div
-Convert an image to HTML div data.
+Convert an image into HTML div data.
