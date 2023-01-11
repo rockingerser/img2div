@@ -25,6 +25,7 @@ button, input[type=button], input[type=submit] {
     -moz-appearance: none;
     appearance: none;
     height: auto;
+    margin: 2px 0;
     padding: 0;
     color: #fff;
     border: 0;
@@ -32,6 +33,10 @@ button, input[type=button], input[type=submit] {
     background-color: #9600fc;
     font-size: 1em;
     font-weight: 600;
+}
+button:disabled, input[type=button]:disabled, input[type=submit]:disabled {
+    filter: opacity(.5);
+    cursor: not-allowed;
 }
 input[type=range] {
     -webkit-appearance: none;
@@ -114,7 +119,7 @@ input[type=file] {
     box-sizing: border-box;
     border-radius: .75em;
     background-color: #fff;
-    width: min(90%, 720px);
+    width: min(90%, 1080px);
     padding: 20px;
     min-height: 90vh;
 }
