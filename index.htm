@@ -6,6 +6,18 @@
     <title>Convert image to div online</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="style/common.css">
+    <html-cache>
+        <div class="alert-dial-bkg">
+            <style>
+                body {
+                    overflow: hidden;
+                }
+            </style>
+            <div class="alert-dial">
+                <span class="alert-dial-close">X</span>
+            </div>
+        </div>
+    </html-cache>
 </head>
 <body>
     <main id="window-main">
@@ -34,19 +46,19 @@
             </div>
             Or load image from URL:
             <div id="urls">
-                <input id="first-url-upload" class="url-upload" type="url" placeholder="https://www.example.com/myimage.png">
+                <input id="first-url-upload" class="url-upload" type="url" placeholder="https://example.com/myimage.png">
             </div>
             <p class="attr">Note that most online images are <a target="_blank" href="https://support.google.com/legal/answer/3463239">protected by copyright</a>.</p>
             <input id="add-urls" type="button" value="Add More">
             <h2>Settings</h2>
-            <div>
+            <div style="display:none">
                 <label for="use-invalid">Use invalid HTML to reduce file size.</label>
                 <input id="use-invalid" type="checkbox">
             </div>
             <div>
                 <label for="compress">Compression level:</label>
-                <input id="compress" type="range" min="0" max="512" value="1">
-                <span id="compress-level">1</span>
+                <input id="compress" type="range" min="0" max="765" value="0">
+                <span id="compress-level">0</span>
             </div>
             <div>
                 <label for="qual">Image quality (Lower values may increase convertion size):</label>

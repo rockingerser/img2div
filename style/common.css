@@ -20,6 +20,9 @@ code, pre {
 textarea, code, pre {
     font: .7em courier new, courier, monospace;
 }
+html-cache {
+    display: none;
+}
 button, input[type=button], input[type=submit] {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -137,6 +140,32 @@ input[type=file] {
 .attr {
     font-weight: 900;
     font-size: .5em;
+}
+.alert-dial-bkg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0008;
+    z-index: 92384293482384942849389428984;
+}
+.alert-dial {
+    width: clamp(min(100%, 480px), 90%, 720px);
+    height: clamp(min(100%, 360px), 80%, 480px);
+    background-color: #fff;
+    border-radius: 5px;
+    overflow: auto;
+}
+.alert-dial-close {
+    float: right;
+    padding: 3px 9px;
+    background-color: #f44;
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
 }
 h1, h2, h3, h4, h5, h6 {
     text-align: center;

@@ -6,6 +6,12 @@
             setTimeout(resolve, ms);
         });
     }
+
+    const onerrorRes = {
+        width: 314,
+        height: 60
+    };
+
     const form = document.getElementById('upload-form');
     const fileInput = document.getElementById('image-upload');
     const useInvalid = document.getElementById('use-invalid');
@@ -24,6 +30,7 @@
     const urlDiv = document.getElementById('urls');
     const firstUrlUpload = document.getElementById('first-url-upload');
     const filesSpan = document.getElementById('files');
+    const htmlCache = document.querySelector('html-cache');
     const oldURLs = [];
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d', {
@@ -33,6 +40,8 @@
 
     let updated = false;
     let urlButtons = 1;
+
+    htmlCache.remove();
 
     imgQual.addEventListener('input', function () {
         imgQualLevel.innerText = this.value * 100 + '%';
@@ -56,14 +65,6 @@
             }
             oldURLs.push(URL.createObjectURL(file));
         }
-        const imageUrls = document.querySelectorAll('.url-upload');
-        for (let i = 0; i < imageUrls.length; i++) {
-            const currUrl = imageUrls[i];
-            if (currUrl.value == '') {
-                continue;
-            }
-            oldURLs.push(currUrl.value);
-        }
         updated = true;
     });
     addMore.addEventListener('click', function () {
@@ -74,7 +75,7 @@
 
         input.className = 'url-upload';
         input.type = 'url';
-        input.placeholder = 'https://www.example.com/myimage.png';
+        input.placeholder = 'https://example.com/myimage.png';
         input.required = true;
 
         button.type = 'button';
@@ -128,6 +129,8 @@
                 const div = document.createElement('div');
                 const image = document.createElement('img');
                 image.src = url;
+                image.crossOrigin = 'Anonymous';
+
                 if (widthInput.value != '') {
                     image.width = widthInput.value;
                 }
@@ -135,15 +138,28 @@
                     image.height = heightInput.value;
                 }
 
-                async function load() {
+                async function load(e) {
                     image.removeEventListener('load', load);
+                    image.removeEventListener('error', load);
+
+                    const typeError = e.type == 'error';
+                    const currentSrc = image.currentSrc;
+
+                    if (typeError) {
+                        canvas.width = onerrorRes.width;
+                        canvas.height = onerrorRes.height;
+                        image.src = canvas.toDataURL('image/webp', 0);
+                    }
 
                     div.appendChild(image);
                     const divImage = document.createElement('div');
                     divImage.className = 'div-image';
 
-                    canvas.width = image.offsetWidth > 0 ? image.offsetWidth : image.naturalWidth;
-                    canvas.height = image.offsetHeight > 0 ? image.offsetHeight : image.naturalHeight;
+                    const normalWidth = typeError ? onerrorRes.width : image.naturalWidth;
+                    const normalHeight = typeError ? onerrorRes.height : image.naturalHeight;
+
+                    canvas.width = image.offsetWidth > 0 ? image.offsetWidth : normalWidth;
+                    canvas.height = image.offsetHeight > 0 ? image.offsetHeight : normalHeight;
 
                     image.width = canvas.width;
                     image.height = canvas.height;
@@ -155,15 +171,34 @@
 
                     ctx.filter = `contrast(${contrast}) brightness(${brightness}) saturate(${saturate}) hue-rotate(${hueRotate}deg)`;
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-
+                    
+                    if (typeError) {
+                        ctx.transform(canvas.width / normalWidth, 0, 0, canvas.height / normalHeight, 0, 0);
+                        ctx.fillStyle = '#efefef';
+                        ctx.setLineDash([4, 2]);
+                        ctx.strokeStyle = '#aaa';
+                        ctx.lineWidth = 2
+                        ctx.fillRect(0, 0, normalWidth, normalHeight);
+                        ctx.strokeRect(2, 2, normalWidth - 4, normalHeight - 4);
+                        ctx.fillStyle = '#000';
+                        ctx.textBaseline = 'top';
+                        ctx.font = '14px helvetica neue, helvetica, arial, sans-serif';
+                        ctx.fillText('An error occurred and this image could not load.', 7, 7, normalWidth - 10);
+                        ctx.fillText('Target: ' + currentSrc, 7, 7 + 16, normalWidth - 10);
+                        ctx.fillText('Press F12 to view more details.', 7, 7 + 16 * 2, normalWidth - 10);
+                    } else {
+                        ctx.resetTransform();
+                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                    }
+                    
                     let data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    const pixel = data.data;
+                    let pixel = data.data;
 
                     let oldColor = null;
                     let currColor = null;
                     let single = null;
                     let diff = 0;
+
                     const useinvalid = useInvalid.checked ? 'z' : 'div';
                     let lockedIndexes = [];
                     let RepeatIndex = 0;
@@ -188,7 +223,7 @@
                             const arrColor = currColor.split(',');
                             diff = getDiff(arrColor[0], arrColor[1], arrColor[2], arrColor[3]);
 
-                            if (diff < compression.value) {
+                            if (diff < compression.value && i / 4 % canvas.width > 0) {
                                 pixel[i] = arrColor[0];
                                 pixel[i + 1] = arrColor[1];
                                 pixel[i + 2] = arrColor[2];
@@ -199,23 +234,30 @@
                         }
                         ctx.putImageData(data, 0, 0);
                     }
-
-                    canvas.toBlob(function (blob) {
-                        const url = URL.createObjectURL(blob);
-                        image.src = url;
-                        ctx.clearRect(0, 0, canvas.width, canvas.height);
-                        ctx.filter = '';
-                        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-                        tempURLs.push(url);
-                        data = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    }, 'image/webp', Number(imgQual.value));
+                    await new Promise(function (resolve) {
+                        canvas.toBlob(function (blob) {
+                            const url = URL.createObjectURL(blob);
+                            image.src = url;
+                            image.onload = function() {
+                                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                                ctx.filter = '';
+                                ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+                                tempURLs.push(url);
+                                data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                                pixel = data.data;
+                                resolve();
+                            };
+                        }, 'image/webp', Number(imgQual.value));
+                    });
 
                     const triggerButton = document.createElement('input');
                     triggerButton.type = 'button';
                     triggerButton.value = 'Generate div data';
                     div.appendChild(triggerButton);
+                    let width = 1
                     triggerButton.addEventListener('click', function () {
                         triggerButton.disabled = true;
+                        let htmlString = `<div style=width:${canvas.width}px;display:flex;flex-wrap:wrap>`;
                         for (i = 0; i < pixel.length; i += 4) {
                             /*if (lockedIndexes.includes(i)) {
                                 continue;
@@ -224,7 +266,7 @@
                             currColor = getColor();
 
                             if (diff == 0 && i / 4 % canvas.width > 0) {
-                                single.style.width = parseInt(single.style.width) + 1 + 'px';
+                                width++;
                                 /*
                                 const oldIndex = i;
                                 let rows = 1;
@@ -272,28 +314,49 @@
                                 }
                                 i = oldIndex;*/
                             } else {
-                                single = document.createElement(useinvalid);
-                                single.style.width = '1px';
-                                single.style.height = '1px';
+                                const currCArr = currColor.split(',');
+                                let hex = '';
+                                for (let i2 = 0; i2 < currCArr.length; i2++) {
+                                    const color = Number(currCArr[i2]);
+                                    if (i2 == 3 && color >= 255) {
+                                        break;
+                                    }
+                                    let singleHex = color.toString(16);
+                                    if (singleHex.length == 1) {
+                                        singleHex += singleHex[0];
+                                    }
+                                    hex += singleHex;
+                                }
+                                if (hex.length == 6 && hex[0] == hex[1] && hex[2] == hex[3] && hex[4] == hex[5]) {
+                                    hex = hex[0] + hex[2] + hex[4];
+                                } else if (hex[0] == hex[1] && hex[2] == hex[3] && hex[4] == hex[5] && hex[6] == hex[7]) {
+                                    hex = hex[0] + hex[2] + hex[4] + hex[6];
+                                }
+                                if (single != null) {
+                                    htmlString += single + `width:${width}px></div>`;
+                                }
+                                width = 1;
+                                single = `<div style=background:#${hex};height:1px;`;
                                 if (containsTallDivs) {
                                     single.style.position = 'absolute';
                                     single.style.left = i / 4 % canvas.width + 'px';
                                     single.style.top = Math.floor(i / 4 / canvas.width) + 'px';
                                 }
-                                single.style.background = 'rgba(' + currColor + ')';
-                                divImage.appendChild(single);
+                                continue;
                             }
                         }
+                        htmlString += '</div>';
 
-                        div.insertAdjacentText('beforeend', `Buffer size: ${Math.round(divImage.outerHTML.length / 1024)} kB`);
+                        div.insertAdjacentText('beforeend', `Buffer size: ${Math.floor(htmlString.length / 1024)} kB`);
                         const code = document.createElement('textarea');
-                        code.innerText = divImage.outerHTML;
+                        code.innerText = htmlString;
                         code.style.width = '400px';
                         code.style.height = '200px';
                         code.style.lineBreak = 'anywhere';
                         div.appendChild(code);
                     });
                 }
+                image.addEventListener('error', load);
                 image.addEventListener('load', load);
                 output.appendChild(div);
             }
